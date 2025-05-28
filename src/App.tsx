@@ -12,7 +12,7 @@ type Task = {
 };
 
 const App: React.FC = () => {
-  const [data, setData] = useState<Task>();
+    const [data, setData] = useState<Task[]>([]);
   const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -21,13 +21,15 @@ const App: React.FC = () => {
             .catch((err) => setError(err.message));
     }, []);
     // @ts-ignore
+
   return (
       <>
           <div style={{padding: '20px'}}>
               <h2>List of Items</h2>
-              {/*{data.map(item => ( */}
+              <h3><CreateTaskForm/></h3>
+              {data.map((item: any) => (
               <div
-                  key={data?.id}
+                  key={item.id}
                   style={{
                       border: '1px solid #ccc',
                       padding: '10px',
@@ -35,13 +37,9 @@ const App: React.FC = () => {
                       borderRadius: '5px',
                   }}
               >
-                  {data?.title}
+                  {item.title}
               </div>
-              {/*))}*/}
-          </div>
-          {/*<button onClick={() => CreateTaskForm.setShowForm(true)}>Add Task</button>*/}
-          <div>
-              <CreateTaskForm />
+              ))}
           </div>
       </>
   );

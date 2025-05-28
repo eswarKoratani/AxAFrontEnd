@@ -11,19 +11,34 @@ const CreateTaskDialog: React.FC = () => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [taskCreated, setTaskCreated] = useState(false);
 
     useEffect(() => {
         const titleSanitized = DOMPurify.sanitize(title.trim());
         const descriptionSanitized = DOMPurify.sanitize(description.trim());
+        const startDateSanitized = DOMPurify.sanitize(startDate.trim());
+        const endDateSanitized = DOMPurify.sanitize(endDate.trim());
+        var date = new Date(startDateSanitized)
+        var longStartDate = date.getTime()
+        var newdate = new Date(endDateSanitized)
+        var longEndDate = newdate.getTime()
         if(submitted) {
             const params = { "title" : titleSanitized,
-                "Description" : descriptionSanitized
+                "description": descriptionSanitized,
+                "startDate": longStartDate,
+                "endDate": longEndDate
             }
             APIManager.createTask(params)
                 .then((json) => setData(json))
                 .catch((err) => setError(err.message));
         }
+        if (error != null) {
+            setTaskCreated(true);
+        }
     }, [submitted]);
+
 
     const handleSubmit = (e: React.FormEvent) => {
 
@@ -33,6 +48,14 @@ const CreateTaskDialog: React.FC = () => {
         alert('Form submitted');
         setShowDialog(false);
     };
+
+    useEffect(() => {
+        if (taskCreated) {
+            APIManager.getTasks()
+                .then((json) => setData(json))
+                .catch((err) => setError(err.message));
+        }
+    }, [taskCreated]);
 
     return (
         <div>
@@ -44,10 +67,12 @@ const CreateTaskDialog: React.FC = () => {
                         <h2>Enter Details</h2>
                         <form onSubmit={handleSubmit}>
                             <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required  />
-                            <input type="text" placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)}required />
-                            <input type="text" placeholder="Status" required />
-                            <input type="date" placeholder="StartDate" required />
-                            <input type="date" placeholder="EndDate" required />
+                            <input type="text" placeholder="Description" value={description}
+                                   onChange={(e) => setDescription(e.target.value)} required/>
+                            <input type="date" placeholder="StartDate" value={startDate}
+                                   onChange={(e) => setStartDate(e.target.value)} required/>
+                            <input type="date" placeholder="EndDate" value={endDate}
+                                   onChange={(e) => setEndDate(e.target.value)} required/>
                             <div>
                                 <button type="submit">Submit</button>
                                 <button type="button" onClick={() => setShowDialog(false)}>Cancel</button>
